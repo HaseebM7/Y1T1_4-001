@@ -20,7 +20,7 @@ public class TargetingManager : MonoBehaviour
     {
         if (targets.Count > 0)
         {
-            MoveTowardsBestTarget(); //Move towards target
+            MoveTowardshighestValue(); //Move towards target
         }
     }
 
@@ -32,25 +32,25 @@ public class TargetingManager : MonoBehaviour
         }
     }
 
-    void MoveTowardsBestTarget()
+    void MoveTowardshighestValue()
     {
-        Target bestTarget = targets.OrderByDescending(t => t.value).First();
+        Target highestValue = targets.OrderByDescending(t => t.value).First();
         
-        if (bestTarget != null)
+        if (highestValue != null)
         {
             //Highlights the target red
-            Renderer targetRenderer = bestTarget.gameObject.GetComponent<Renderer>();
+            Renderer targetRenderer = highestValue.gameObject.GetComponent<Renderer>();
             if (targetRenderer != null)
             {
                 targetRenderer.material.color = Color.red;
             }
             //Moves to Target
-            player.transform.position = Vector3.MoveTowards(player.transform.position, bestTarget.gameObject.transform.position, moveSpeed * Time.deltaTime);
+            player.transform.position = Vector3.MoveTowards(player.transform.position, highestValue.gameObject.transform.position, moveSpeed * Time.deltaTime);
             //Checks distance to remove target
-            if (Vector3.Distance(player.transform.position, bestTarget.gameObject.transform.position) < targetReachDistance)
+            if (Vector3.Distance(player.transform.position, highestValue.gameObject.transform.position) < targetReachDistance)
             {
-                Destroy(bestTarget.gameObject);
-                targets.Remove(bestTarget);
+                Destroy(highestValue.gameObject);
+                targets.Remove(highestValue);
             }
         }
     }
