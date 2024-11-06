@@ -1,55 +1,57 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 public class TargetingManager : MonoBehaviour
 {
-    public List<Target> targets; // List of targets
-    public GameObject player; // Reference to the player
-    public float moveSpeed = 3f; // Speed of the player
-    public float targetReachDistance = 1f; // Distance to reach the target
-
+    public List<Target> targets = new List<Target>(); //list of targets
+    public GameObject player; //Reference to player
+    public float moveSpeed = 3f; //Speed of player
+    public float targetReachDistance = 1f; //Distance to reach target
+    // Start is called before the first frame update
     void Start()
     {
-        targets = new List<Target>();
-        FindTargets(); // Find targets when the game starts
+        FindTargets(); //Locate targets
     }
 
+    // Update is called once per frame
     void Update()
     {
         if (targets.Count > 0)
         {
-            MoveTowardsBestTarget(); // Move towards the best target each frame
+            MoveTowardsBestTarget(); //Move towards target
         }
     }
 
     void FindTargets()
     {
-        // Find all GameObjects with the "Target" tag
-        GameObject[] targetObjects = GameObject.FindGameObjectsWithTag("Target");
-
-        // Add each target to the list with a random value (you can adjust this logic)
-        foreach (GameObject obj in targetObjects)
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Target"))
         {
-            float value = Random.Range(1f, 10f); // Example value assignment
-            targets.Add(new Target(obj, value));
+            targets.Add(new Target(obj, Random.Range(1f, 10f))); //Adds a random value
         }
     }
 
     void MoveTowardsBestTarget()
     {
-        // Get the target with the highest value
         Target bestTarget = targets.OrderByDescending(t => t.value).First();
-
-        // Move towards the best target
-        Vector3 direction = (bestTarget.gameObject.transform.position - player.transform.position).normalized;
-        player.transform.position += direction * moveSpeed * Time.deltaTime;
-
-        // Check if the player is close enough to the target
-        if (Vector3.Distance(player.transform.position, bestTarget.gameObject.transform.position) < targetReachDistance)
+        
+        if (bestTarget != null)
         {
-            Destroy(bestTarget.gameObject); // Destroy the target
-            targets.Remove(bestTarget); // Remove it from the list
+            //Highlights the target red
+            Renderer targetRenderer = bestTarget.gameObject.GetComponent<Renderer>();
+            if (targetRenderer != null)
+            {
+                targetRenderer.material.color = Color.red;
+            }
+            //Moves to Target
+            player.transform.position = Vector3.MoveTowards(player.transform.position, bestTarget.gameObject.transform.position, moveSpeed * Time.deltaTime);
+            //Checks distance to remove target
+            if (Vector3.Distance(player.transform.position, bestTarget.gameObject.transform.position) < targetReachDistance)
+            {
+                Destroy(bestTarget.gameObject);
+                targets.Remove(bestTarget);
+            }
         }
     }
 }
